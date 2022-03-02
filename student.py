@@ -9,14 +9,17 @@ Student = Blueprint('student', __name__)
 @Student.route('/student/volbook/<int:stuId>', methods = ['GET'])
 @Deco
 def getVolunteerWork(stuId):
-    fl,r=OP.select("volId,volTimeInside,volTimeOutside,volTimeLarge,status","stu_vol","stuId=%s",stuId,
-    ["volId","inside","outside","large","status"],only=False)
-    if not fl: return r
-    for i in r:
-        ff,rr=OP.select("volName","volunteer","volId=%s",i["volId"], ["name"])
-        if not ff: return rr
-        i.update({"name": rr["name"]})
-    return {"type":"SUCCESS","message":"获取成功","rec":r}
+	fl,r=OP.select("volId,volTimeInside,volTimeOutside,volTimeLarge,status","stu_vol","stuId=%s", stuId,
+	["volId","inside","outside","large","status"],only=False)
+	if not fl:
+		if "message" in r and r["message"]==OP.OP_NOT_FOUND:
+			return {"type":"ERROR","messsage":"该学生没有义工记录"}
+		return r
+	for i in r:
+		ff,rr=OP.select("volName","volunteer","volId=%s",i["volId"], ["name"])
+		if not ff: return rr
+		i.update({"name": rr["name"]})
+	return {"type":"SUCCESS","message":"获取成功","rec":r}
 
 @Student.route('/student/volcert/', methods = ['POST'])
 @Deco
