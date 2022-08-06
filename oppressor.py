@@ -50,41 +50,42 @@ def select(col,src,exp,val,ret,only=True): # 估计能用了
 	# val:传入的数据，元组 ret:返回的格式，列表，内容为字符串，为[]则为col
 	# only:是否只取一个
 	# 返回值:一个布尔值、一个字典，格式由ret决定（若only=False则为一个数组）
-	s="SELECT %s FROM %s WHERE %s;"%(col,src,exp)
+	s = "SELECT %s FROM %s WHERE %s;"%(col,src,exp)
 	print("Selecting:",s,val) # 生成的SQL语句和参数 #
 	DB.execute(s,val)
-	r=DB.fetchall()
+
+	r = DB.fetchall()
 	print("Select Result:",r) # SQL返回值 #
-	if ret==[]: # 这个尽量避免使用吧，可能会有奇奇怪怪的锅（本来还想偷点懒的）
-		ret=list(col.split(","))
-		for i in len(ret): ret[i]=ret[i].strip()
-	if len(r)==0:
-		return False, {"type":"ERROR","message":"数据库信息错误：未查询到相关信息"}
-	if len(r)==1:
-		result={} # 格式化返回值
-		for j in range(0,len(ret)):
+	if ret == []: # 这个尽量避免使用吧，可能会有奇奇怪怪的锅（本来还想偷点懒的）
+		ret = list(col.split(","))
+		for i in len(ret): ret[i] = ret[i].strip()
+	if len(r) == 0:
+		return False, {"type": "ERROR","message": "数据库信息错误：未查询到相关信息"}
+	if len(r) == 1:
+		result = {} # 格式化返回值
+		for j in range(0, len(ret)):
 			result.update({ret[j]: r[0][j]})
 		if only: return True, result
 		else: return True, [result] # 就算只有一个，没有Only还是要返回数组
 	else:
 		if only: # 理论上不应该有这种情况，真出现了估计是Insert的锅
-			return False, {"type":"ERROR","message":"数据库信息错误：要求一个但查询到多个"}
-		result=[]
-		for i in range(0,len(r)):
+			return False, {"type": "ERROR","message": "数据库信息错误：要求一个但查询到多个"}
+		result = []
+		for i in range(0, len(r)):
 			result.append({}) # 格式化返回值
-			for j in range(0,len(ret)):
+			for j in range(0, len(ret)):
 				result[i].update({ret[j]: r[i][j]})
 		return True, result
 
 # ！！！注意！！！下面两个函数是没有返回值的！！！
 # fl,r=OP.update(...) 错！
 # OP.update(...) 对！
-def update(col,src,exp,val): # 估计能用了
+def update(col, src, exp, val): # 估计能用了
 	# 参数同上
-	s="UPDATE %s SET %s WHERE %s;"%(src,col,exp)
-	print("Updating:",s,val) # 生成的SQL语句和参数 #
-	DB.execute(s,val)
-	r=DB.fetchall()
+	s = "UPDATE %s SET %s WHERE %s;" % (src, col, exp)
+	print("Updating:", s, val) # 生成的SQL语句和参数 #
+	DB.execute(s, val)
+	r = DB.fetchall()
 
 def insert(col,src,val): # 估计能用了
 	# 参数同上

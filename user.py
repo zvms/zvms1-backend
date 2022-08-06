@@ -14,8 +14,10 @@ def login_NoToken():
 	userid = json_data().get("userid")
 	password = json_data().get("password")
 	version = json_data().get("version")
-	if version != res.CURRENT_VERSION:
-                return {"type": "ERROR", "message": res.CURRENT_VERSION_ERROR_MESSAGE}
+	print(userid, version)
+	# TODO
+	# if version != res.CURRENT_VERSION:
+	# 	return {"type": "ERROR", "message": res.CURRENT_VERSION_ERROR_MESSAGE}
 	st, val = OP.userLogin(userid, password)
 	ret={}
 	if st:
