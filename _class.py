@@ -11,7 +11,8 @@ Class = Blueprint('class', __name__)
 @Deco
 def getClassList(): # 好了
 	# 是不是还要加上特殊情况的判断？
-    fl,r=OP.select("class","user","userId>200000",(),["id"],only=False)
+    # fl,r=OP.select("class","user","userId>200000",(),["id"],only=False)
+    fl,r=OP.select("class","user","class>200000",(),["id"],only=False)
     print(fl,r)
     if not fl: return r
     classes = []

@@ -8,13 +8,15 @@ import sys
 # 不要吐槽这堆奇奇怪怪的变量名了。。全部改掉太麻烦了
 # 在其他文件中请使用：json_data(),tkData()
 # ！！！注意上面这两个括号！！！
-postdata={}
+postdata = {}
 def json_data():
 	return postdata
-tkst=TK.BAD
-tkdata={}
+
+tkst = TK.BAD
+tkdata = {}
 def tkStatus():
 	return tkst
+
 def tkData():
 	return tkdata
 
@@ -51,15 +53,15 @@ def Deco(func):
 				return json.dumps({'type':'ERROR', 'message':"未获取到Token，请重新登陆"})
 		# 上面这一段是在上面的if里面的啊，要加上缩进的
 
-		try:
-			r=func(*args,**kwargs)
-			# print("result->",r) # 函数返回的JSON
-			# 如果想做错误输出的话加在这里
-			# sys.stdout=tmp # 重新回到控制台输出 #
-			return json.dumps(r)
-		except:
-			# 理论上不应该有这个
-			# 出现这种情况说明代码锅了或者前端接口错了
-			# sys.stdout=tmp # 重新回到控制台输出 #
-			return json.dumps({'type':'ERROR','message':'未知错误'})
+		# try:
+		r=func(*args,**kwargs)
+		# print("result->",r) # 函数返回的JSON
+		# 如果想做错误输出的话加在这里
+		# sys.stdout=tmp # 重新回到控制台输出 #
+		return json.dumps(r)
+		# except:
+		# 	# 理论上不应该有这个
+		# 	# 出现这种情况说明代码锅了或者前端接口错了
+		# 	# sys.stdout=tmp # 重新回到控制台输出 #
+		# 	return json.dumps({'type':'ERROR','message':'未知错误'})
 	return wrapper
