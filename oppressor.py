@@ -41,6 +41,9 @@ def classIdToString(a):
 
 	return ret
 
+OP_NOT_FOUND = "数据库信息错误：未查询到相关信息"
+OP_NOT_ONLY = "数据库信息错误：要求一个但查询到多个"
+
 # 下面三个是对MySQL操作的封装
 # 对SQL的操作尽量使用这三个而不是直接DB.execute()
 # 标出来的是调试输出
@@ -56,22 +59,22 @@ def select(col,src,exp,val,ret,only=True): # 估计能用了
 
 	r = DB.fetchall()
 	print("Select Result:",r) # SQL返回值 #
-	if ret == []: # 这个尽量避免使用吧，可能会有奇奇怪怪的锅（本来还想偷点懒的）
-		ret = list(col.split(","))
-		for i in len(ret): ret[i] = ret[i].strip()
-	if len(r) == 0:
-		return False, {"type": "ERROR","message": "数据库信息错误：未查询到相关信息"}
-	if len(r) == 1:
-		result = {} # 格式化返回值
-		for j in range(0, len(ret)):
+	if ret==[]: # 这个尽量避免使用吧，可能会有奇奇怪怪的锅（本来还想偷点懒的）
+		ret=list(col.split(","))
+		for i in len(ret): ret[i]=ret[i].strip()
+	if len(r)==0:
+		return False, {"type":"ERROR","message":OP_NOT_FOUND}
+	if len(r)==1:
+		result={} # 格式化返回值
+		for j in range(0,len(ret)):
 			result.update({ret[j]: r[0][j]})
 		if only: return True, result
 		else: return True, [result] # 就算只有一个，没有Only还是要返回数组
 	else:
 		if only: # 理论上不应该有这种情况，真出现了估计是Insert的锅
-			return False, {"type": "ERROR","message": "数据库信息错误：要求一个但查询到多个"}
-		result = []
-		for i in range(0, len(r)):
+			return False, {"type":"ERROR","message":OP_NOT_ONLY}
+		result=[]
+		for i in range(0,len(r)):
 			result.append({}) # 格式化返回值
 			for j in range(0, len(ret)):
 				result[i].update({ret[j]: r[i][j]})

@@ -18,8 +18,11 @@ Volunteer = Blueprint('volunteer', __name__)
 @Deco
 def getVolunteerList(): # 可以了
 	fl,r=OP.select("volId,volName,description,volDate,volTime,status,stuMax","volunteer","true",(),
-	              ["id", "name", "description","date","time","status","stuMax"],only=False)
-	if not fl: return r # 数据库错误
+				  ["id", "name", "description","date","time","status","stuMax"],only=False)
+	if not fl:
+		if "message" in r and r["message"]==OP.OP_NOT_FOUND:
+			return {"type":"ERROR","message":"当前无义工"}
+		return r
 	r=sorted(r,key=lambda x: x["date"])
 	return {"type":"SUCCESS","message":"获取成功","volunteer":r[::-1]}
 
@@ -28,7 +31,7 @@ def getVolunteerList(): # 可以了
 def getVolunteer(volId): # 可以了
 	fl,r=OP.select("volName,volDate,volTime,stuMax,nowStuCount,description,status,volTimeInside,volTimeOutside,volTimeLarge",
 				  "volunteer","volId=%s",(volId),
-		          ["name", "date", "time", "stuMax","stuNow","description","status","inside",  "outside",     "large"])
+				  ["name", "date", "time", "stuMax","stuNow","description","status","inside",  "outside",	  "large"])
 	if not fl: return r # 数据库错误
 	r.update({"type":"SUCCESS","message":"获取成功"})
 	return r
@@ -142,10 +145,13 @@ def createVolunteer(): # 大概可以了
 def getSignerList(volId): # 过了
 	# 判断权限
 	# if not tkData().get("permission") in [PMS_TEACHER,PMS_MANAGER,PMS_SYSTEM]:
-	# 	return {'type':'ERROR', 'message':"权限不足"}
+	#	return {'type':'ERROR', 'message':"权限不足"}
 	ret={"type":"SUCCESS", "message":"获取成功","result":[]}
 	fl,r=OP.select("stuId","stu_vol","volId=%s",(volId),["stuId"],only=False)
-	if not fl: return r # 数据库错误：没有这个义工
+	if not fl:
+		if "message" in r and r["message"]==OP.OP_NOT_FOUND:
+			return {"type":"SUCCESS","message":"当前义工无人报名"}
+		return r
 	for i in r: # 返回学生姓名
 		ff,rr=OP.select("stuId,stuName","student","stuId=%s",(i["stuId"]),["stuId","stuName"])
 		if not ff: return rr # 数据库错误：没有这个人
@@ -179,8 +185,8 @@ def getJoinerList(volId): # 这个到底要不要？
 def getUnaudited():
 	fl, r = OP.select("volId,stuId,thought,picture", "stu_vol", "((status=%s)and length(thought)>0)", (STATUS_WAITING), ["volId","stuId","thought","picture"],only=False)
 	if not fl:
-		if r["message"] == "数据库信息错误：未查询到相关信息":
-			r = {"type":"SUCCESS","message":"全部审核完毕"}
+		if "message" in r and r["message"]==OP.OP_NOT_FOUND:
+			r={"type":"SUCCESS","message":"全部审核完毕"}
 		return r
 
 	# 图片从md5展开成base64
@@ -292,20 +298,20 @@ def modifyVolunteer(volId):
 	return {"type":"SUCCESS", "message":"创建成功"}
 	return {"type":"SUCCESS", "message":"修改成功"}
 {
-    "name": "义工活动1",
-    "date": "2020.10.1",
-    "time": "13:00",
-    "stuMax": 20,
-    "description": "...",
-    "inside": 0,
-    "outside": 3,
-    "large": 0,
-    "class": [
-        {"id": 202001, "stuMax": 10, "visible": true},
-        {"id": 202002, "stuMax": 5, "visible": true},
-        {"id": 202003, "stuMax": 10, "visible": true}
-        {"id": 202004, "stuMax": 0, "visible": false},
-    ]
+	"name": "义工活动1",
+	"date": "2020.10.1",
+	"time": "13:00",
+	"stuMax": 20,
+	"description": "...",
+	"inside": 0,
+	"outside": 3,
+	"large": 0,
+	"class": [
+		{"id": 202001, "stuMax": 10, "visible": true},
+		{"id": 202002, "stuMax": 5, "visible": true},
+		{"id": 202003, "stuMax": 10, "visible": true}
+		{"id": 202004, "stuMax": 0, "visible": false},
+	]
 }
 '''
 
@@ -359,7 +365,7 @@ def randthought(): # 随机一条感想
 	cnt = 0
 	while True:
 		cnt += 1
-		if cnt > 10: break   # 说明系统刚上线
+		if cnt > 10: break	 # 说明系统刚上线
 		r = OP.getRandThought()
 		if r == None: break
 		if r[2] == 1:

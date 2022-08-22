@@ -24,5 +24,5 @@ def checkPermission(cls, pms, stu): # 判断一个用户是否有权限管理该
 	return pms in [PMS_MANAGER, PMS_TEACHER, PMS_SYSTEM] or (pms==PMS_CLASS and cls*100<=stu<cls*100+100)
 
 
-CURRENT_VERSION = "ae8e177f096c97444b63ecf328f0e058"
-CURRENT_VERSION_ERROR_MESSAGE = "服务器维护中"
+CURRENT_VERSION = "51141167bd8394d8da590fddaeb3d91e"
+CURRENT_VERSION_ERROR_MESSAGE = "版本号过期，请重新下载"
