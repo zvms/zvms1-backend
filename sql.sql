@@ -62,7 +62,8 @@ create table stu_vol (
 	volTimeInside int,
 	volTimeOutside int,
 	volTimeLarge int,
-	thought text
+	thought text,
+	picture text /* 图片的md5 */
 )charset=utf8;
 
 create table class_vol (

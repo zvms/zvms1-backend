@@ -5,6 +5,13 @@ from deco import *
 from res import *
 import oppressor as OP
 
+from PIL import Image
+from io import BytesIO
+from base64 import b64decode
+from hashlib import md5
+from os import makedirs
+from os.path import exists
+
 Volunteer = Blueprint('volunteer', __name__)
 
 @Volunteer.route('/volunteer/list', methods = ['GET', 'OPTIONS']) # 这里不需要参数传入，使用GET方式。下同
@@ -176,12 +183,24 @@ def getJoinerList(volId): # 这个到底要不要？
 @Volunteer.route('/volunteer/unaudited', methods=['GET'])
 @Deco
 def getUnaudited():
-	fl,r=OP.select("volId,stuId,thought","stu_vol","((status=%s)and length(thought)>0)",(STATUS_WAITING),["volId","stuId","thought"],only=False)
+	fl, r = OP.select("volId,stuId,thought,picture", "stu_vol", "((status=%s)and length(thought)>0)", (STATUS_WAITING), ["volId","stuId","thought","picture"],only=False)
 	if not fl:
 		if "message" in r and r["message"]==OP.OP_NOT_FOUND:
 			r={"type":"SUCCESS","message":"全部审核完毕"}
 		return r
-	return {"type":"SUCCESS","message":"获取成功","result":r}
+
+	# 图片从md5展开成base64
+	for i in r:
+		if i['picture'] is not None and i['picture'] != '':
+			pics = []
+			for c, p in enumerate(i['picture'].split(',')):
+				pics.append({
+					'src': open(f"pics/{i['stuId']}/{p}").read(),
+					'id': c
+				})
+			i['picture'] = pics
+	
+	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
 @Volunteer.route('/volunteer/audit/<int:volId>', methods = ['POST'])
 @Deco
@@ -201,7 +220,7 @@ def auditThought(volId): # 大概是过了
 	for i in json_data()["thought"]:
 		stuId=i["stuId"]
 		if i["status"]!=STATUS_ACCEPT:
-						OP.update("thought=%s","stu_vol","volId=%s AND stuId=%s",("",volId,stuId))
+			OP.update("thought=%s","stu_vol","volId=%s AND stuId=%s",("",volId,stuId))
 		# 修改状态。状态由JSON传入
 		OP.update("status=%s","stu_vol","volId=%s AND stuId=%s",(i["status"],volId,stuId))
 		# 把stu_vol的表里的数据填上
@@ -301,20 +320,42 @@ def modifyVolunteer(volId):
 def submitThought(volId): # 大概是过了
 	# 判断权限
 	for i in json_data()["thought"]:
-		if not checkPermission(tkData()["class"],tkData()["permission"],i):
-			return {"type":"ERROR","message":"权限不足：学生列表中有别班学生"}
+		if not checkPermission(tkData()["class"], tkData()["permission"], i["stuId"]):
+			return {"type": "ERROR", "message": "权限不足：学生列表中有别班学生"}
+
 	# 判断状态是否可以提交
 	for i in json_data()["thought"]:
-		fl,r=OP.select("status","stu_vol","volId=%s AND stuId=%s",(volId,i["stuId"]),["status"])
+		fl, r = OP.select("status", "stu_vol", "volId=%s AND stuId=%s", (volId, i["stuId"]), ["status"])
 		if not fl: return r # 数据库错误
-		if r["status"]==STATUS_ACCEPT:
-			return {"type":"ERROR", "message":"学生%d已过审，不可重复提交"%i["stuId"]}
-		if r["status"]==STATUS_REJECT:
-			return {"type":"ERROR", "message":"学生%d不可重新提交"%i["stuId"]}
+		if r["status"] == STATUS_ACCEPT:
+			return {"type": "ERROR", "message": "学生%d已过审，不可重复提交" % i["stuId"]}
+		if r["status"] == STATUS_REJECT:
+			return {"type": "ERROR", "message": "学生%d不可重新提交" % i["stuId"]}
+
 	# 修改数据库
 	for i in json_data()["thought"]:
-		OP.update("thought=%s","stu_vol","volId=%s and stuId=%s",(i["content"],volId,i["stuId"]))
-		OP.update("status=%s","stu_vol","volId=%s and stuId=%s",(STATUS_WAITING,volId,i["stuId"]))
+		OP.update("thought=%s", "stu_vol", "volId=%s and stuId=%s", (i["content"], volId, i["stuId"]))
+		OP.update("status=%s", "stu_vol", "volId=%s and stuId=%s", (STATUS_WAITING, volId, i["stuId"]))
+
+		# 图片数据储存到本地
+		pics = i["pictures"]
+		pics_md5 = []
+		for pic in pics:
+			t = md5()
+			t.update(pic.encode("utf-8"))
+			target = t.hexdigest()
+			pics_md5.append(target)
+
+			if not exists(f"pics/{i['stuId']}"):
+				makedirs(f"pics/{i['stuId']}")
+
+			f = open(f"pics/{i['stuId']}/{target}", 'w')
+			f.write(pic)
+			f.close()
+
+		pic = ",".join(pics_md5)
+
+		OP.update("picture=%s", "stu_vol", "volId=%s and stuId=%s", (pic, volId, i["stuId"]))
 	return {"type":"SUCCESS","message":"提交成功"}
 
 @Volunteer.route('/volunteer/randomThought', methods=['GET'])
