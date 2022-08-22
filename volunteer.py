@@ -5,9 +5,6 @@ from deco import *
 from res import *
 import oppressor as OP
 
-from PIL import Image
-from io import BytesIO
-from base64 import b64decode
 from hashlib import md5
 from os import makedirs
 from os.path import exists
