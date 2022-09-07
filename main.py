@@ -11,7 +11,7 @@ from report import Report
 
 # Flask init
 app = Flask(__name__)
-app.debug = False  # 仅在测试环境打开！
+app.debug = True  # 仅在测试环境打开！
 app.config["SECRET_KEY"] = "PaSsw0rD@1234!@#$"
 
 CORS(app, supports_credentials=True) # 允许跨域

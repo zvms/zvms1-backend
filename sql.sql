@@ -10,6 +10,7 @@ create table user (
 	userName char(64),
 	class int,
 	permission smallint,
+	notices text,
 	password char(255),
 	primary key (userId)
 )charset=utf8;
@@ -19,7 +20,7 @@ insert into user (userName,class,permission,password)
 insert into user (userName,class,permission,password)
           values ("高一2班",202002,0,"e10adc3949ba59abbe56e057f20f883e");
 insert into user (userName,class,permission,password)
-          values ("Admin",202001,3,"e10adc3949ba59abbe56e057f20f883e");
+          values ("Admin",110001,3,"e10adc3949ba59abbe56e057f20f883e");
 
 create table student (
 	stuId int,
@@ -71,4 +72,11 @@ create table class_vol (
 	class int,
 	stuMax int,
 	nowStuCount int
+)charset=utf8;
+
+create table user_notice (
+	noticeTitle text,
+	noticeText text,
+	deadTime text,
+	noticeId int
 )charset=utf8;
