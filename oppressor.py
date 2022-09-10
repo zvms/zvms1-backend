@@ -15,6 +15,7 @@ def classIdToString(a):
 	# 教师 100001 100002
 	# 管理员 110001 110002
 	# 系统 120003 120004
+	# 超管 130001
 	if _year//100 == 10:
 		ret = "教师"
 		return ret
@@ -24,8 +25,11 @@ def classIdToString(a):
 	elif _year//100 == 12:
 		ret = "系统"
 		return ret
+	elif _year//100 == 13:
+		ret = "超管"
+		return ret
 	
-	if _class <= 10:
+	if _class <= 9:
 		ret = ret + "高"
 	elif _class <= 17:
 		ret = ret + "蛟"
@@ -35,7 +39,7 @@ def classIdToString(a):
 		ret = ret + "二"
 	elif _year == thisYear - 2:
 		ret = ret + "三"
-	ret = ret + (["NULL","1","2","3","4","5","6","7","8","9","10","NULL","2","3","4","5","6","7"])[_class] #如果我没记错的话校徽是这样的
+	ret = ret + (["NULL","1","2","3","4","5","6","7","8","9","1","2","3","4","5","6","7"])[_class] #如果我没记错的话校徽是这样的
 	ret = ret + "班"
 	if "NULL" in ret: ret = "无班级"
 

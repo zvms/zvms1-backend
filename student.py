@@ -13,7 +13,7 @@ def getVolunteerWork(stuId):
 	["volId","inside","outside","large","status"],only=False)
 	if not fl:
 		if "message" in r and r["message"]==OP.OP_NOT_FOUND:
-			return {"type":"ERROR","messsage":"该学生没有义工记录"}
+			return {"type":"ERROR","message":"该学生没有义工记录"}
 		return r
 	for i in r:
 		ff,rr=OP.select("volName","volunteer","volId=%s",i["volId"], ["name"])

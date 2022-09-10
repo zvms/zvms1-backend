@@ -4,7 +4,7 @@ import time
 from deco import *
 from res import *
 import oppressor as OP
-
+from base64 import b64decode, b64encode
 from hashlib import md5
 from os import makedirs
 from os.path import exists
@@ -192,7 +192,7 @@ def getUnaudited():
 			pics = []
 			for c, p in enumerate(i['picture'].split(',')):
 				pics.append({
-					'src': open(f"pics/{i['stuId']}/{p}").read(),
+					'src': b64encode(open(f"pics/{i['stuId']}/{p}.jpg", 'rb').read()).decode('utf-8'),
 					'id': c
 				})
 			i['picture'] = pics
@@ -346,8 +346,8 @@ def submitThought(volId): # 大概是过了
 			if not exists(f"pics/{i['stuId']}"):
 				makedirs(f"pics/{i['stuId']}")
 
-			f = open(f"pics/{i['stuId']}/{target}", 'w')
-			f.write(pic)
+			f = open(f"pics/{i['stuId']}/{target}.jpg", 'wb')
+			f.write(b64decode(pic))
 			f.close()
 
 		pic = ",".join(pics_md5)

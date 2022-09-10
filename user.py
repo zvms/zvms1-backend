@@ -4,8 +4,7 @@ import tokenlib as TK
 import res
 import traceback
 import oppressor as OP
-
-noticeId = 0
+from datetime import date
 
 User = Blueprint('user', __name__)
 
@@ -73,11 +72,23 @@ def getNotices():
     ids = r["notices"].split(",")
     data = []
 
+    year, month, day = [int(i) for i in str(date.today()).split('-')]
+
     for i in ids:
-        fl, r = OP.select("noticeTitle, noticeText, deadtime", "user_notice", "noticeId = %s", i, ["title", "text", "deadtime"])
-        data.append(r)
-    
-    print(data)
+        _, r = OP.select("noticeTitle, noticeText, deadtime", "user_notice", "noticeId = %s", i, ["title", "text", "deadtime"])
+        y, m, d = [int(i) for i in r["deadtime"].split('-')]
+        if y < year:
+            continue
+        elif y > year:
+            data.append(r)
+        elif m < month:
+            continue
+        elif m > month:
+            data.append(r)
+        elif d < day:
+            continue
+        else:
+            data.append(r)
 
     return {
         "type": "SUCCESS",
@@ -87,18 +98,17 @@ def getNotices():
 @User.route('/user/sendNotice', methods = ['POST'])
 @Deco
 def sendNotice():
-    global noticeId
 
     target = json_data().get("target")
     title = json_data().get("title")
     message = json_data().get("message")
+    deadtime = json_data().get("deadtime")
 
-    noticeId += 1
-    OP.insert("noticeTitle, noticeText, deadTime, noticeId", "user_notice", (title, message, "", noticeId))
+    noticeId = OP.select("count(*)", "user_notice", "1=%s", 1, ["n"])[1]["n"]
+    OP.insert("noticeTitle, noticeText, deadTime, noticeId", "user_notice", (title, message,deadtime, noticeId))
 
     for i in target:
         fl, r = OP.select("notices", "user", "class = %s", i, ["notices"])
-        print("-----", fl, r)
         if r["notices"] == None:
             OP.update("notices=%s", "user", "class=%s", (noticeId, i))
         else:
