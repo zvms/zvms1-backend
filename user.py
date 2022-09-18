@@ -10,10 +10,10 @@ User = Blueprint('user', __name__)
 
 @User.route('/user/login', methods = ['POST','OPTIONS','GET'])
 @Deco
-def login_NoToken():
-    userid = json_data().get("userid")
-    password = json_data().get("password")
-    version = json_data().get("version")
+def login_NoToken(json_data, token_data):
+    userid = json_data.get("userid")
+    password = json_data.get("password")
+    version = json_data.get("version")
     if version != res.CURRENT_VERSION:
         return {"type": "ERROR", "message": res.CURRENT_VERSION_ERROR_MESSAGE}
     st, val = OP.userLogin(userid, password)
@@ -35,18 +35,18 @@ def login_NoToken():
 
 @User.route('/user/logout', methods = ['GET','OPTIONS','POST'])
 @Deco
-def logout_NoToken():
+def logout_NoToken(json_data, token_data):
     return {'type': 'SUCCESS', 'message': '登出成功！'}
     #最好在这里做点什么吧，比如删除cookie什么的
 
 @User.route('/user/info', methods = ['GET', 'POST'])
 @Deco
-def info():
-    return {'type':'SUCCESS', 'message':"获取成功", 'info':tkData()}
+def info(json_data, token_data):
+    return {'type':'SUCCESS', 'message':"获取成功", 'info':token_data}
 
 @User.route('/user/getInfo/<int:userId>', methods=['POST'])
 @Deco
-def getInfo(userId):
+def getInfo(userId, json_data, token_data):
     fl,r=OP.select("userName,class,permission","user","userId=%s",userId,["userName","class","permission"])
     if not fl: return r
     r.update({"type":"SUCCESS", "message":"获取成功"})
@@ -54,19 +54,19 @@ def getInfo(userId):
 
 @User.route('/user/modPwd', methods = ['POST'])
 @Deco
-def modifyPassword():
-    old=json_data().get("oldPwd")
-    new=json_data().get("newPwd")
-    fl, r = OP.select("userid","user", "userId = %s and password = %s", (tkData().get("userid"), old), ["user"])
+def modifyPassword(json_data, token_data):
+    old=json_data.get("oldPwd")
+    new=json_data.get("newPwd")
+    fl, r = OP.select("userid","user", "userId = %s and password = %s", (token_data.get("userid"), old), ["user"])
     if not fl: return {"type": "ERROR", "message": "密码错误"}
-    print(type(tkData().get("userid")))
-    OP.update("password=%s","user","userId=%s",(new, tkData().get("userid"),))
+    print(type(token_data.get("userid")))
+    OP.update("password=%s","user","userId=%s",(new, token_data.get("userid"),))
     return {"type":"SUCCESS", "message":"修改成功"}
 
 @User.route('/user/notices')
 @Deco
-def getNotices():
-    fl, r = OP.select("notices", "user", "userId = %s", tkData().get("userid"), ["notices"])
+def getNotices(json_data, token_data):
+    fl, r = OP.select("notices", "user", "userId = %s", token_data.get("userid"), ["notices"])
     if r["notices"] is None: return { "type": "SUCCESS", "data": [] }
 
     ids = r["notices"].split(",")
@@ -98,12 +98,12 @@ def getNotices():
 
 @User.route('/user/sendNotice', methods = ['POST'])
 @Deco
-def sendNotice():
+def sendNotice(json_data, token_data):
 
-    target = json_data().get("target")
-    title = json_data().get("title")
-    message = json_data().get("message")
-    deadtime = json_data().get("deadtime")
+    target = json_data.get("target")
+    title = json_data.get("title")
+    message = json_data.get("message")
+    deadtime = json_data.get("deadtime")
 
     # 不知道为什么有时候会变成None
     if deadtime is None:

@@ -8,6 +8,7 @@ import sys
 # 不要吐槽这堆奇奇怪怪的变量名了。。全部改掉太麻烦了
 # 在其他文件中请使用：json_data(),tkData()
 # ！！！注意上面这两个括号！！！
+'''
 postdata = {}
 def json_data():
 	return postdata
@@ -19,7 +20,7 @@ def tkStatus():
 
 def tkData():
 	return tkdata
-
+'''
 # 以后把调试的代码写在这边，把一些公用的功能也可以移到这边
 # 在所有函数名前面加上@Deco
 # 这样路由的函数直接返回一个字典就好了
@@ -28,12 +29,14 @@ def Deco(func):
 	def wrapper(*args,**kwargs):
 		# tmp,sys.stdout=sys.stdout,open("logs/debug.log","w+") # 重定向到文件输出 #
 		# print("Entering Function->%s:"%func.__name__)
-		global postdata, tkst, tkdata # 重要！！
+		postdata = {}
+		tkst = TK.BAD
+		tkdata = {} # 重要！！
 		try: # 为了防止空POST出锅
 			postdata=json.loads(request.get_data().decode("utf-8"))
 			# print("Postdata:",postdata) # 加载到的POST数据
 		except:
-			postdata=""
+			postdata={}
 			# print("No Postdata loaded.")
 
 		if not "NoToken" in func.__name__:
@@ -54,7 +57,7 @@ def Deco(func):
 		# 上面这一段是在上面的if里面的啊，要加上缩进的
 
 		# try:
-		r=func(*args,**kwargs)
+		r = func(*args, **kwargs, json_data = postdata, token_data = tkdata)
 		# print("result->",r) # 函数返回的JSON
 		# 如果想做错误输出的话加在这里
 		# sys.stdout=tmp # 重新回到控制台输出 #

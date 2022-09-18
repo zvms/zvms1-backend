@@ -7,15 +7,15 @@ Notice = Blueprint('notice', __name__)
 
 @Notice.route('/notice/new', methods = ['POST'])
 @Deco
-def newNotice():
+def newNotice(json_data, token_data):
 	pass
 
 @Notice.route('/notice/query', methods = ['GET'])
 @Deco
-def queryNotice():
+def queryNotice(json_data, token_data):
 	pass
 
 @Notice.route('/notice/modify/<ntcId>', methods = ['POST'])
 @Deco
-def modifyNotice(ntcId):
+def modifyNotice(ntcId, json_data, token_data):
 	pass

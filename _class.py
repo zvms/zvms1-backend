@@ -9,7 +9,7 @@ Class = Blueprint('class', __name__)
 
 @Class.route('/class/list', methods = ['GET'])
 @Deco
-def getClassList(): # 好了
+def getClassList(json_data, token_data): # 好了
 	# 是不是还要加上特殊情况的判断？
     # fl,r=OP.select("class","user","userId>200000",(),["id"],only=False)
     fl,r=OP.select("class","user","class>200000",(),["id"],only=False)
@@ -28,7 +28,7 @@ def getClassList(): # 好了
 
 @Class.route("/class/stulist/<int:classId>", methods = ['GET'])
 @Deco
-def getStudentList(classId): # 好了
+def getStudentList(classId, json_data, token_data): # 好了
     fl,r=OP.select("stuId,stuName,volTimeInside,volTimeOutside,volTimeLarge","student",
         "stuId > %s and stuId < %s",(str(classId*100),str(classId*100+100)),
         ["id","name","inside","outside","large"],only=False)
@@ -41,7 +41,7 @@ def getStudentList(classId): # 好了
 
 @Class.route("/class/volunteer/<int:classId>", methods = ['GET','OPTIONS'])
 @Deco
-def getClassVolunteer(classId): # 还没调
+def getClassVolunteer(classId, json_data, token_data): # 还没调
     fl,r=OP.select("volId","class_vol","class=%s",(classId),["id"],only=False)
     if not fl: return r
     ret={"type":"SUCCESS","message":"获取成功","volunteer":[]}
@@ -54,7 +54,7 @@ def getClassVolunteer(classId): # 还没调
 
 @Class.route('/class/noThought/<int:classId>', methods=['GET'])
 @Deco
-def getNoThought(classId): # 还没调
+def getNoThought(classId, json_data, token_data): # 还没调
 	fl,r=OP.select("volId,stuId","stu_vol","status=%s or (status = %s and thought='')",(STATUS_RESUBMIT,STATUS_WAITING),["volId","stuId"],only=False)
 	if not fl:
 		if r["message"]=="数据库信息错误：未查询到相关信息":

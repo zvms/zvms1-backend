@@ -8,7 +8,7 @@ Student = Blueprint('student', __name__)
 
 @Student.route('/student/volbook/<int:stuId>', methods = ['GET'])
 @Deco
-def getVolunteerWork(stuId):
+def getVolunteerWork(stuId, json_data, token_data):
 	fl,r=OP.select("volId,volTimeInside,volTimeOutside,volTimeLarge,status","stu_vol","stuId=%s", stuId,
 	["volId","inside","outside","large","status"],only=False)
 	if not fl:
@@ -23,8 +23,8 @@ def getVolunteerWork(stuId):
 
 @Student.route('/student/volcert/', methods = ['POST'])
 @Deco
-def getVolunteerCertification():
-	stuId,volId=json_data()["stuId"],json_data()["volId"]
+def getVolunteerCertification(json_data, token_data):
+	stuId,volId=json_data["stuId"],json_data["volId"]
 	f1,r1=OP.select(
 		"stuId,volTimeInside,volTimeOutside,volTimeLarge,status,thought",
 		"stu_vol","stuId=%s AND volId=%s",(stuId,volId),

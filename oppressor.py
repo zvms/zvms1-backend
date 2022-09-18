@@ -2,7 +2,7 @@
 # 这个文件封装了一些针对数据库的操作
 import database as DB
 
-thisYear = 2021 # 以后要改成自动获取
+thisYear = 2022 # 以后要改成自动获取
 # 并且这个应该是指学年而不是当前年份
 # 这个函数被用到的地方：_class.py
 def classIdToString(a):

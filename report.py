@@ -10,7 +10,7 @@ Report = Blueprint('report', __name__)
 @Report.route('/report', methods = ['GET', 'OPTIONS', 'POST'])
 @Deco
 def submitReport_NoToken():
-    report = json_data().get('report')
+    report = json_data.get('report')
     f = open('./report.log', 'a+')
     # 2021.11.22 10.40 Modified by nekomoyi
     f.write('[' + str(datetime.datetime.now()) + '] ' + report + '\n')
