@@ -67,7 +67,7 @@ def modifyPassword():
 @Deco
 def getNotices():
     fl, r = OP.select("notices", "user", "userId = %s", tkData().get("userid"), ["notices"])
-    if r["notices"] == None: return { "type": "SUCCESS", "data": [] }
+    if r["notices"] is None: return { "type": "SUCCESS", "data": [] }
 
     ids = r["notices"].split(",")
     data = []
@@ -76,6 +76,7 @@ def getNotices():
 
     for i in ids:
         _, r = OP.select("noticeTitle, noticeText, deadtime", "user_notice", "noticeId = %s", i, ["title", "text", "deadtime"])
+
         y, m, d = [int(i) for i in r["deadtime"].split('-')]
         if y < year:
             continue
@@ -104,11 +105,15 @@ def sendNotice():
     message = json_data().get("message")
     deadtime = json_data().get("deadtime")
 
+    # 不知道为什么有时候会变成None
+    if deadtime is None:
+        deadtime = str(date.today())
+
     noticeId = OP.select("count(*)", "user_notice", "1=%s", 1, ["n"])[1]["n"]
-    OP.insert("noticeTitle, noticeText, deadTime, noticeId", "user_notice", (title, message,deadtime, noticeId))
+    OP.insert("noticeTitle, noticeText, deadTime, noticeId", "user_notice", (title, message, deadtime, noticeId))
 
     for i in target:
-        fl, r = OP.select("notices", "user", "class = %s", i, ["notices"])
+        _, r = OP.select("notices", "user", "class = %s", i, ["notices"])
         if r["notices"] == None:
             OP.update("notices=%s", "user", "class=%s", (noticeId, i))
         else:
