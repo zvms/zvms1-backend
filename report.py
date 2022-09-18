@@ -13,6 +13,6 @@ def submitReport_NoToken():
     report = json_data().get('report')
     f = open('./report.log', 'a+')
     # 2021.11.22 10.40 Modified by nekomoyi
-    f.write('[' + datetime.datetime.now() + '] ' + report + '\n')
+    f.write('[' + str(datetime.datetime.now()) + '] ' + report + '\n')
     f.close()
-    return {"type":"SUCCESS", "message":"提交成功"}
+    return { "type": "SUCCESS", "message": "提交成功" }

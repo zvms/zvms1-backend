@@ -1,7 +1,10 @@
-venv
+env
 __pycache__
 *.pyc
 .pyc
 Scripts
 Lib
 pics
+*.log
+logs
+launcher
