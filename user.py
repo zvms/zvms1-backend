@@ -109,8 +109,10 @@ def sendNotice(json_data, token_data):
     if deadtime is None:
         deadtime = str(date.today())
 
-    noticeId = OP.select("count(*)", "user_notice", "1=%s", 1, ["n"])[1]["n"]
-    OP.insert("noticeTitle, noticeText, deadTime, noticeId", "user_notice", (title, message, deadtime, noticeId))
+    OP.insert("noticeTitle, noticeText, deadTime", "user_notice", (title, message, deadtime))
+
+    _, r = OP.select("noticeId", "user_notice", "noticeTitle=%s and noticeText=%s and deadtime", (title, message, deadtime), ["noticeId"])
+    noticeId = r["noticeId"]
 
     for i in target:
         _, r = OP.select("notices", "user", "class = %s", i, ["notices"])

@@ -78,5 +78,6 @@ create table user_notice (
 	noticeTitle text,
 	noticeText text,
 	deadTime text,
-	noticeId int
+	noticeId int AUTO_INCREMENT,
+	primary key (noticeId)
 )charset=utf8;
