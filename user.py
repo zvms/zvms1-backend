@@ -111,8 +111,10 @@ def sendNotice(json_data, token_data):
 
     OP.insert("noticeTitle, noticeText, deadTime", "user_notice", (title, message, deadtime))
 
-    _, r = OP.select("noticeId", "user_notice", "noticeTitle=%s and noticeText=%s and deadtime", (title, message, deadtime), ["noticeId"])
-    noticeId = r["noticeId"]
+    _, r = OP.select("noticeId", "user_notice", "noticeTitle=%s and noticeText=%s and deadtime=%s", (title, message, deadtime), ["noticeId"], False)
+    
+    noticeId = max(map(lambda x: x["noticeId"], r))
+    print(noticeId)
 
     for i in target:
         _, r = OP.select("notices", "user", "class = %s", i, ["notices"])
