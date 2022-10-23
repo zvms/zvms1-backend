@@ -39,7 +39,7 @@ def classIdToString(a):
 		ret = ret + "二"
 	elif _year == thisYear - 2:
 		ret = ret + "三"
-	ret = ret + (["NULL","1","2","3","4","5","6","7","8","9","1","2","3","4","5","6","7"])[_class] #如果我没记错的话校徽是这样的
+	ret = ret + (["NULL","1","2","3","4","5","6","7","8","9","NULL","1","2","3","4","5","6","7"])[_class] #如果我没记错的话校徽是这样的
 	ret = ret + "班"
 	if "NULL" in ret: ret = "无班级"
 
@@ -66,7 +66,7 @@ def select(col,src,exp,val,ret,only=True): # 估计能用了
 	if ret==[]: # 这个尽量避免使用吧，可能会有奇奇怪怪的锅（本来还想偷点懒的）
 		ret=list(col.split(","))
 		for i in len(ret): ret[i]=ret[i].strip()
-	if len(r)==0:
+	if r is None or len(r)==0:
 		return False, {"type":"ERROR","message":OP_NOT_FOUND}
 	if len(r)==1:
 		result={} # 格式化返回值

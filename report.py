@@ -9,7 +9,7 @@ Report = Blueprint('report', __name__)
 
 @Report.route('/report', methods = ['GET', 'OPTIONS', 'POST'])
 @Deco
-def submitReport_NoToken():
+def submitReport_NoToken(json_data, token_data):
     report = json_data.get('report')
     f = open('./report.log', 'a+')
     # 2021.11.22 10.40 Modified by nekomoyi
