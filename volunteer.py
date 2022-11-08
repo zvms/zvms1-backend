@@ -186,15 +186,21 @@ def getUnaudited(json_data, token_data):
 			r={"type":"SUCCESS","message":"全部审核完毕"}
 		return r
 
+	# TODO
 	# 图片从md5展开成base64
+	# for i in r:
+	# 	if i['picture'] is not None and i['picture'] != '':
+	# 		pics = []
+	# 		for c, p in enumerate(i['picture'].split(',')):
+	# 			pics.append({
+	# 				'src': b64encode(open(f"pics/{i['stuId']}/{p}.jpg", 'rb').read()).decode('utf-8'),
+	# 				'id': c
+	# 			})
+	# 		i['picture'] = pics
+	
 	for i in r:
 		if i['picture'] is not None and i['picture'] != '':
 			pics = []
-			for c, p in enumerate(i['picture'].split(',')):
-				pics.append({
-					'src': b64encode(open(f"pics/{i['stuId']}/{p}.jpg", 'rb').read()).decode('utf-8'),
-					'id': c
-				})
 			i['picture'] = pics
 	
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
