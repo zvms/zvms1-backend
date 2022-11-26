@@ -205,6 +205,32 @@ def getUnaudited(json_data, token_data):
 	
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
+@Volunteer.route('/volunteer/unaudited/list')
+@Deco
+def listUnaudited(json_data, token_data):
+	fl, r = OP.select("volId,stuId", "stu_vol", "((status=%s)and length(thought)>0)", (STATUS_WAITING), ["volId","stuId"],only=False)
+	if not fl:
+		if r.get("message") == OP.OP_NOT_FOUND:
+			r={"type":"SUCCESS","message":"全部审核完毕"}
+		return r
+	return {"type":"SUCCESS", "message": "获取成功", "result": r}
+
+@Volunteer.route('/volunteer/unaudited/fetch')
+@Deco
+def fetchUnaudited(json_data, token_data):
+	fl, r = OP.select("thought,picture", "stu_vol", "(volId=%s and stuId=%s and status=%s and length(thought)>0)", (request.args.get('volId'), request.args.get('stuId'), STATUS_WAITING), ["thought","picture"])
+	if not fl: return r
+	if r.get('picture') not in (None, ''):
+		pics = []
+		for c, p in enumerate(r['picture'].split(',')):
+			with open(f"pics/{request.args.get('stuId')}/{p}.jpg", 'rb') as f:
+				pics.append({
+					'src': b64encode(f.read()).decode('utf-8'),
+					'id': c
+				})
+		r['picture'] = pics
+	return {"type":"SUCCESS", "message": "获取成功", "result": r}
+
 @Volunteer.route('/volunteer/audit/<int:volId>', methods = ['POST'])
 @Deco
 def auditThought(volId, json_data, token_data): # 大概是过了

@@ -1,5 +1,5 @@
 import json
-from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired, BadSignature
+from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired, BadTimeSignature
 import random, hashlib
 
 ERROR = 0

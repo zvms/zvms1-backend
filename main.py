@@ -11,7 +11,7 @@ from report import Report
 
 # Flask init
 app = Flask(__name__)
-app.debug = True  # 仅在测试环境打开！
+#app.debug = True  # 仅在测试环境打开！
 app.config["SECRET_KEY"] = "PaSsw0rD@1234!@#$"
 
 CORS(app, supports_credentials=True) # 允许跨域
@@ -23,11 +23,11 @@ app.register_blueprint(Volunteer)
 app.register_blueprint(Notice)
 app.register_blueprint(Report)
 
-@app.route('/',methods=['POST'])
+@app.route('/',methods=['GET', 'POST'])
 def main():
-   return ""
+   return "连上了"
 
 # manager = Manager(app)
 if __name__ == '__main__':
     # manager.run(host='0.0.0.0', port=5000)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=1145)
