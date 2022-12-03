@@ -205,6 +205,11 @@ def getUnaudited(json_data, token_data):
 	
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
+# 列出所有未审核感想
+# 方法: GET
+# url参数: 无
+# 返回:
+# [{volId<int>: ..., stuId<int>: ...}, ...]
 @Volunteer.route('/volunteer/unaudited/list')
 @Deco
 def listUnaudited(json_data, token_data):
@@ -215,19 +220,31 @@ def listUnaudited(json_data, token_data):
 		return r
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
+# 获取一个未审核感想的详细信息
+# 方法: GET
+# url参数: volId<int>, stuId<int>
+# 返回:
+# {thought<string>: ..., picture<array<base64>>: [...]}
 @Volunteer.route('/volunteer/unaudited/fetch')
 @Deco
 def fetchUnaudited(json_data, token_data):
-	fl, r = OP.select("thought,picture", "stu_vol", "(volId=%s and stuId=%s and status=%s and length(thought)>0)", (request.args.get('volId'), request.args.get('stuId'), STATUS_WAITING), ["thought","picture"])
+	fl, r = OP.select("thought,picture", "stu_vol", "(volId=%s and stuId=%s and status=%s and length(thought)>0)",
+	(request.args.get('volId'), request.args.get('stuId'), STATUS_WAITING), ["thought","picture"])
 	if not fl: return r
 	if r.get('picture') not in (None, ''):
 		pics = []
 		for c, p in enumerate(r['picture'].split(',')):
-			with open(f"pics/{request.args.get('stuId')}/{p}.jpg", 'rb') as f:
-				pics.append({
-					'src': b64encode(f.read()).decode('utf-8'),
-					'id': c
-				})
+			fl, rr = OP.select('data', 'pics', 'md=%s', (p, ), ['data'])
+			if not fl: return rr
+			pics.append({
+				'src': b64encode(rr['data']).decode('utf-8'),
+				'id': c
+			})
+		# 	with open(f"pics/{request.args.get('stuId')}/{p}.jpg", 'rb') as f:
+		# 		pics.append({
+		# 			'src': b64encode(f.read()).decode('utf-8'),
+		# 			'id': c
+		# 		})
 		r['picture'] = pics
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
@@ -374,13 +391,15 @@ def submitThought(volId, json_data, token_data): # 大概是过了
 			t.update(pic.encode("utf-8"))
 			target = t.hexdigest()
 			pics_md5.append(target)
+			with open(f"pics/{i['stuId']}/{target}.jpg", 'wb') as f:
+				OP.insert('md, data', 'pics', (target, f.read()))
 
-			if not exists(f"pics/{i['stuId']}"):
-				makedirs(f"pics/{i['stuId']}")
+		# 	if not exists(f"pics/{i['stuId']}"):
+		# 		makedirs(f"pics/{i['stuId']}")
 
-			f = open(f"pics/{i['stuId']}/{target}.jpg", 'wb')
-			f.write(b64decode(pic))
-			f.close()
+		# 	f = open(f"pics/{i['stuId']}/{target}.jpg", 'wb')
+		# 	f.write(b64decode(pic))
+		# 	f.close()
 
 		pic = ",".join(pics_md5)
 

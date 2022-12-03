@@ -25,7 +25,8 @@ def login_NoToken(json_data, token_data):
             "userid": userid,
             "username": ret['username'],
             "class": ret['class'],
-            "permission": ret['permission']
+            "permission": ret['permission'],
+            'logid': TK.next()
         })})
     else:
         ret.update({"type": "ERROR", "message": "用户名或密码错误"})
@@ -35,7 +36,10 @@ def login_NoToken(json_data, token_data):
 
 @User.route('/user/logout', methods = ['GET','OPTIONS','POST'])
 @Deco
-def logout_NoToken(json_data, token_data):
+def logout(json_data, token_data):
+    print(token_data)
+    TK.remove(token_data)
+    # return {'type':'SUCCESS', 'message': str(token_data)}
     return {'type': 'SUCCESS', 'message': '登出成功！'}
     #最好在这里做点什么吧，比如删除cookie什么的
 
