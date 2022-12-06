@@ -1,4 +1,6 @@
 from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired, BadTimeSignature
+from models import db, Log
+from operator import attrgetter
 import random, hashlib
 import oppressor as OP
 import database as DB
@@ -16,7 +18,9 @@ def generateStrangeString():
     return s
 
 if len(sys.argv) > 1 and sys.argv[1].lower() == 'restart':
-    DB.execute('TRUNCATE log')
+    Log.query.filter().delete()
+    db.session.commit()
+    # DB.execute('TRUNCATE log')
     SECRET_KEY = generateStrangeString()
     SALT = generateStrangeString()
     with open('tokengen.cfg', 'w') as f:
@@ -28,16 +32,22 @@ else:
 EXPIRES_IN = 36000000
 
 def next():
-    DB.execute('INSERT INTO log VALUES()')
-    fl, r = OP.select('MAX(id)', 'log', 'true', (), ['max'])
-    return r['max']
+    # DB.execute('INSERT INTO log VALUES()')
+    db.session.add(Log())
+    db.session.commit()
+    return max(map(attrgetter('id'), Log.query.all()))
+    # fl, r = OP.select('MAX(id)', 'log', 'true', (), ['max'])
+    # return r['max']
 
 def exists(data):
-    fl, r = OP.select('*', 'log', 'id=%s', (data['logid'], ), [''])
-    return fl
+    return Log.query.get(int(data['logid']))
+    # fl, r = OP.select('*', 'log', 'id=%s', (data['logid'], ), [''])
+    # return fl
 
 def remove(token_data):
-    DB.execute('DELETE FROM log WHERE id=%s', token_data['logid'])
+    Log.query.filter_by(id=token_data['logid']).delete()
+    db.session.commit()
+    # DB.execute('DELETE FROM log WHERE id=%s', token_data['logid'])
 
 def generateToken(data):
     s = TimedJSONWebSignatureSerializer(secret_key=SECRET_KEY, expires_in=EXPIRES_IN, salt=SALT)
