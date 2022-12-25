@@ -7,6 +7,12 @@ import datetime
 
 Report = Blueprint('report', __name__)
 
+'''
+POST /report
+params {
+    report: string
+}
+'''
 @Report.route('/report', methods = ['GET', 'OPTIONS', 'POST'])
 @Deco
 def submitReport_NoToken(json_data, token_data):

@@ -8,6 +8,16 @@ from datetime import date
 
 User = Blueprint('user', __name__)
 
+'''
+POST /users/login
+params {
+    id: int,
+    pwd: string
+}
+return {
+    token: string
+}
+'''
 @User.route('/user/login', methods = ['POST','OPTIONS','GET'])
 @Deco
 def login_NoToken(json_data, token_data):
@@ -33,17 +43,35 @@ def login_NoToken(json_data, token_data):
         ret.update(val)
     return ret
 
+'''
+POST /users/logout
+'''
 @User.route('/user/logout', methods = ['GET','OPTIONS','POST'])
 @Deco
 def logout_NoToken(json_data, token_data):
     return {'type': 'SUCCESS', 'message': '登出成功！'}
     #最好在这里做点什么吧，比如删除cookie什么的
 
+# 已去掉
 @User.route('/user/info', methods = ['GET', 'POST'])
 @Deco
 def info(json_data, token_data):
     return {'type':'SUCCESS', 'message':"获取成功", 'info':token_data}
 
+'''
+GET /users/<int:id>
+return {
+    name: string,
+    auth: int,
+    cls: int,
+    clsName: string
+}
+如果是学生再加上 {
+    inside: int,
+    outside: int,
+    large: int
+}
+'''
 @User.route('/user/getInfo/<int:userId>', methods=['POST'])
 @Deco
 def getInfo(userId, json_data, token_data):
@@ -52,6 +80,13 @@ def getInfo(userId, json_data, token_data):
     r.update({"type":"SUCCESS", "message":"获取成功"})
     return r
 
+'''
+POST /users/mod-pwd
+params {
+    old: string,
+    new: string
+}
+'''
 @User.route('/user/modPwd', methods = ['POST'])
 @Deco
 def modifyPassword(json_data, token_data):
@@ -63,6 +98,10 @@ def modifyPassword(json_data, token_data):
     OP.update("password=%s","user","userId=%s",(new, token_data.get("userid"),))
     return {"type":"SUCCESS", "message":"修改成功"}
 
+'''
+/notices?t=<id>
+见notice.py
+'''
 @User.route('/user/notices')
 @Deco
 def getNotices(json_data, token_data):
@@ -96,6 +135,16 @@ def getNotices(json_data, token_data):
         "data": data
     }
 
+'''
+POST /notices/send
+params {
+    title: string,
+    content: string,
+    deadtime: string,
+    type: int, # 可以为1(用户), 2(班级), 3(学校)
+    target: int | null # 如果是学校通知就为null, 但不能省略
+}
+'''
 @User.route('/user/sendNotice', methods = ['POST'])
 @Deco
 def sendNotice(json_data, token_data):

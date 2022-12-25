@@ -1,3 +1,7 @@
+'''
+由于user, student合并, 新版本中不存在Student视图
+'''
+
 from flask import Blueprint, request
 import json
 from deco import *
@@ -6,6 +10,11 @@ import oppressor as OP
 
 Student = Blueprint('student', __name__)
 
+'''
+这个功能被分成了两块
+义工时间到了GET /users/<int:id>, 见user.py
+
+'''
 @Student.route('/student/volbook/<int:stuId>', methods = ['GET'])
 @Deco
 def getVolunteerWork(stuId, json_data, token_data):
