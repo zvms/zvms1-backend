@@ -13,7 +13,7 @@ Student = Blueprint('student', __name__)
 '''
 这个功能被分成了两块
 义工时间到了GET /users/<int:id>, 见user.py
-
+义工记录到了GET /volunteers?s=<id>, 见volunteer.py
 '''
 @Student.route('/student/volbook/<int:stuId>', methods = ['GET'])
 @Deco
@@ -30,6 +30,11 @@ def getVolunteerWork(stuId, json_data, token_data):
 		i.update({"name": rr["name"]})
 	return {"type":"SUCCESS","message":"获取成功","rec":r}
 
+'''
+现在的义工报酬都只能有一种类型, 你不能在一次义工中既赚校内时间又得校外时间
+校内为1, 校外为2, 大型为3, 其他地方也一样
+这一部分的数据可以从GET /volunteers, GET /thoughts等api中获取
+'''
 @Student.route('/student/volcert/', methods = ['POST'])
 @Deco
 def getVolunteerCertification(json_data, token_data):

@@ -11,12 +11,13 @@ User = Blueprint('user', __name__)
 '''
 POST /users/login
 params {
-    id: int,
-    pwd: string
+    "id": int,
+    "pwd": string
 }
 return {
-    token: string
+    "token": string
 }
+如果要在登录时获取信息的话, 手动调用/users/<int:id>
 '''
 @User.route('/user/login', methods = ['POST','OPTIONS','GET'])
 @Deco
@@ -59,17 +60,17 @@ def info(json_data, token_data):
     return {'type':'SUCCESS', 'message':"获取成功", 'info':token_data}
 
 '''
-GET /users/<int:id>
+PATCH /users/<int:id>
 return {
-    name: string,
-    auth: int,
-    cls: int,
-    clsName: string
+    "name": string,
+    "auth": int,
+    "cls": int,
+    "clsName": string
 }
 如果是学生再加上 {
-    inside: int,
-    outside: int,
-    large: int
+    "inside": int,
+    "outside": int,
+    "large": int
 }
 '''
 @User.route('/user/getInfo/<int:userId>', methods=['POST'])
@@ -81,10 +82,10 @@ def getInfo(userId, json_data, token_data):
     return r
 
 '''
-POST /users/mod-pwd
+PATCH /users/mod-pwd
 params {
-    old: string,
-    new: string
+    "old": string,
+    "new": string
 }
 '''
 @User.route('/user/modPwd', methods = ['POST'])
@@ -138,11 +139,11 @@ def getNotices(json_data, token_data):
 '''
 POST /notices/send
 params {
-    title: string,
-    content: string,
-    deadtime: string,
-    type: int, # 可以为1(用户), 2(班级), 3(学校)
-    target: int | null # 如果是学校通知就为null, 但不能省略
+    "title": string,
+    "content": string,
+    "deadtime": string,
+    "type": int, # 可以为1(用户), 2(班级), 3(学校)
+    "target": int | null # 如果是学校通知就为null, 但不能省略
 }
 '''
 @User.route('/user/sendNotice', methods = ['POST'])

@@ -30,4 +30,15 @@ urlparams {
 }
 e.g. /notices?f=20220905 # 获取20220905发送的通知
      /notices?s # 获取学校通知
+
+PUT /notices/<int:id>
+params {
+	"title": string,
+	"content": string,
+	"deadtime": string
+}
+# 需要注意的是, 现在title长度必须不超过32, content不超过1024
+# volunteer的name, description, thought的thought类似
+
+DELETE /notices/<int:id>
 '''

@@ -7,6 +7,15 @@ from res import *
 
 Class = Blueprint('class', __name__)
 
+'''
+GET /classes
+return [
+    {
+        "id": int,
+        "name": string
+    }, ...
+]
+'''
 @Class.route('/class/list', methods = ['GET'])
 @Deco
 def getClassList(json_data, token_data): # 好了
@@ -26,6 +35,23 @@ def getClassList(json_data, token_data): # 好了
         "class": r
     }
 
+'''
+GET /classes/<int:id>
+return {
+    "teachers": [
+        {
+            "id": int,
+            "name": string
+        }
+    ]
+    "students": [
+        {
+            "id": int,
+            "name": string
+        }
+    ]
+}
+'''
 @Class.route("/class/stulist/<int:classId>", methods = ['GET'])
 @Deco
 def getStudentList(classId, json_data, token_data): # 好了
@@ -39,6 +65,9 @@ def getStudentList(classId, json_data, token_data): # 好了
         "student": r
     }
 
+'''
+GET /volunteers?c=<id>
+'''
 @Class.route("/class/volunteer/<int:classId>", methods = ['GET','OPTIONS'])
 @Deco
 def getClassVolunteer(classId, json_data, token_data): # 还没调
@@ -52,6 +81,9 @@ def getClassVolunteer(classId, json_data, token_data): # 还没调
         ret["volunteer"].append(rr)
     return ret
 
+'''
+GET /thoughts?c=<id>&s=1
+'''
 @Class.route('/class/noThought/<int:classId>', methods=['GET'])
 @Deco
 def getNoThought(classId, json_data, token_data): # 还没调

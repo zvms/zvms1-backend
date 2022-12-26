@@ -11,6 +11,21 @@ from os.path import exists
 
 Volunteer = Blueprint('volunteer', __name__)
 
+'''
+GET /volunteers
+urlparams {
+	h: int, # 举办者
+	s: int, # 参加的学生
+	c: int, # 参加的班级
+	m: string, # 名称(模糊匹配)
+}
+return {
+	"id": int,
+	"name": string,
+	"time": string # 注意我把原来分开的date和time合并了
+}
+用法和/notices差不多
+'''
 @Volunteer.route('/volunteer/list', methods = ['GET', 'OPTIONS']) # 这里不需要参数传入，使用GET方式。下同
 @Deco
 def getVolunteerList(json_data, token_data): # 可以了
@@ -23,6 +38,20 @@ def getVolunteerList(json_data, token_data): # 可以了
 	r=sorted(r,key=lambda x: x["date"])
 	return {"type":"SUCCESS","message":"获取成功","volunteer":r[::-1]}
 
+'''
+GET /volunteers/<int:id>
+return {
+	"name": string,
+	"description": string,
+	"time": string,
+	"type": int,
+	"reward": int,
+	"joiners": [{
+		id: int,
+        name: string
+	}]
+}
+'''
 @Volunteer.route('/volunteer/fetch/<int:volId>', methods = ['GET', 'OPTIONS'])
 @Deco
 def getVolunteer(volId, json_data, token_data): # 可以了
@@ -58,6 +87,12 @@ def checkStudentCount(js): # 过了
 	for i in js["class"]: mx-=i["stuMax"]
 	return mx<=0
 
+'''
+POST /signup/<int:stuId>
+params {
+	"volId": int
+}
+'''
 @Volunteer.route('/volunteer/signup/<int:volId>', methods = ['POST'])
 @Deco
 def signupVolunteer(volId, json_data, token_data): # 过了
@@ -103,6 +138,22 @@ def signupVolunteer(volId, json_data, token_data): # 过了
 		# 审核过了以后再发义工时间
 	return {"type":"SUCCESS","message":"添加成功"}
 
+'''
+POST /volunteers
+params {
+    "name": string,
+    "description": string,
+    "time": string,
+    "type": int,
+    "reward": int,
+    "classes": [
+		{
+			"id": int,
+			"max": int
+		}
+	]
+}
+'''
 @Volunteer.route('/volunteer/create', methods = ['POST','OPTIONS'])
 @Deco
 def createVolunteer(json_data, token_data): # 大概可以了
@@ -137,6 +188,9 @@ def createVolunteer(json_data, token_data): # 大概可以了
 		OP.insert("volId,class,stuMax,nowStuCount","class_vol",(volId,i["id"],i["stuMax"],0))
 	return {"type":"SUCCESS", "message":"创建成功"}
 
+'''
+这个被合并到了/volunteers里
+'''
 @Volunteer.route('/volunteer/signerList/<int:volId>', methods = ['GET'])
 @Deco
 def getSignerList(volId, json_data, token_data): # 过了
@@ -177,6 +231,10 @@ def getJoinerList(volId, json_data, token_data): # 这个到底要不要？
 	return ret
 '''
 
+'''
+GET /thoughts?s=2
+详见文件末
+'''
 @Volunteer.route('/volunteer/unaudited', methods=['GET'])
 @Deco
 def getUnaudited(json_data, token_data):
@@ -205,6 +263,10 @@ def getUnaudited(json_data, token_data):
 	
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
+'''
+PATCH /volunteers/<int:stuId>/<int:volId>
+详见文件末
+'''
 @Volunteer.route('/volunteer/audit/<int:volId>', methods = ['POST'])
 @Deco
 def auditThought(volId, json_data, token_data): # 大概是过了
@@ -237,6 +299,10 @@ def auditThought(volId, json_data, token_data): # 大概是过了
 		# 如果SQL的update可以一次修改多列的话麻烦把上面改了
 	return {"type":"SUCCESS", "message":"审核成功"}
 
+'''
+这个api也没了
+用POST /volunteers替代
+'''
 @Volunteer.route('/volunteer/holiday', methods=['POST'])
 @Deco
 def holidayVolunteer(json_data, token_data):
@@ -318,6 +384,10 @@ def modifyVolunteer(volId, json_data, token_data):
 }
 '''
 
+'''
+PATCH /thoughts/<int:stuId>/<int:volId>
+详见文件末
+'''
 @Volunteer.route('/volunteer/thought/<int:volId>', methods = ['POST'])
 @Deco
 def submitThought(volId, json_data, token_data): # 大概是过了
@@ -361,6 +431,9 @@ def submitThought(volId, json_data, token_data): # 大概是过了
 		OP.update("picture=%s", "stu_vol", "volId=%s and stuId=%s", (pic, volId, i["stuId"]))
 	return {"type":"SUCCESS","message":"提交成功"}
 
+'''
+这玩意有存在的必要吗?
+'''
 @Volunteer.route('/volunteer/randomThought', methods=['GET'])
 def randthought(json_data, token_data): # 随机一条感想
 	# respdata = {'type':'ERRR',"message": "感想获取不到"}
@@ -376,3 +449,69 @@ def randthought(json_data, token_data): # 随机一条感想
 			respdata = {"type": "SUCCESS", "stuId": r[1], "stuName": name, "content": r[7]}
 			break
 	return json.dumps(respdata)
+
+'''
+DELETE /signup/<int:stuId>/<int:volId>
+# 取消报名
+
+GET /signup
+urlparams {
+	c: int # 班级
+}
+return [
+	{
+		"stuId": int,
+		"stuName" :string,
+		"volId": int,
+		"volName": string
+	}
+]
+# 注意, 与/notices, /volunteers等不同, 这里的url参数是必须的
+
+PATCH /signup/<int:stuId>/<int:volId>
+# 审核报名(教师和支书)
+
+GET /thoughts
+urlparams {
+	c: int, # 班级
+	s: int, # 学生
+	S: int, # 状态
+	v: int # 义工
+}
+return [
+	{
+		"status": int,
+		"stuId": int,
+        "stuName": string,
+		"volId": int,
+        "volName": string
+	}
+]
+
+GET /thougths/<int:id>
+返回"reason", "thought", "pics", "reward"中的一些
+
+PATCH /thoughts
+这个api用法很多, 参数多样, 如果没有"status": int的话为修改感想:
+	"thought": string,
+	"pics": [string(base64)]
+下面是有status时可能的取值:
+2:
+    打回感想
+	"reason": string # 长度小于1024
+3:
+	提交感想
+	"thought": string,
+	"pics": [string(base64), ...]
+4:
+	初审感想
+5:
+	通过感想
+	"reward": int
+6:
+	拒绝感想
+
+觉得这个api太难用的话我可以搞几个小的
+
+
+'''
