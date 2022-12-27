@@ -8,6 +8,7 @@ from base64 import b64decode, b64encode
 from hashlib import md5
 from os import makedirs
 from os.path import exists
+from res import STATIC_FOLDER
 
 Volunteer = Blueprint('volunteer', __name__)
 
@@ -215,19 +216,16 @@ def listUnaudited(json_data, token_data):
 		return r
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
-@Volunteer.route('/volunteer/unaudited/fetch')
+@Volunteer.route('/volunteer/unaudited/<int:stuId>/<int:volId>')
 @Deco
-def fetchUnaudited(json_data, token_data):
-	fl, r = OP.select("thought,picture", "stu_vol", "(volId=%s and stuId=%s and status=%s and length(thought)>0)", (request.args.get('volId'), request.args.get('stuId'), STATUS_WAITING), ["thought","picture"])
+def fetchUnaudited(stuId, volId, json_data, token_data):
+	fl, r = OP.select("thought,picture", "stu_vol", "(volId=%s and stuId=%s and status=%s and length(thought)>0)",
+	 (volId, stuId, STATUS_WAITING), ["thought","picture"])
 	if not fl: return r
-	if r.get('picture') not in (None, ''):
-		pics = []
-		for c, p in enumerate(r['picture'].split(',')):
-			with open(f"pics/{request.args.get('stuId')}/{p}.jpg", 'rb') as f:
-				pics.append({
-					'src': b64encode(f.read()).decode('utf-8'),
-					'id': c
-				})
+	pics = []
+	for i, s in enumerate(r['picture'].split(',')):
+		pics.append({'id': i, 'src': s})
+	if r['picture']:
 		r['picture'] = pics
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
@@ -375,10 +373,7 @@ def submitThought(volId, json_data, token_data): # 大概是过了
 			target = t.hexdigest()
 			pics_md5.append(target)
 
-			if not exists(f"pics/{i['stuId']}"):
-				makedirs(f"pics/{i['stuId']}")
-
-			f = open(f"pics/{i['stuId']}/{target}.jpg", 'wb')
+			f = open(f"{STATIC_FOLDER}/pics/{i['stuId']}/{target}.jpg", 'wb')
 			f.write(b64decode(pic))
 			f.close()
 

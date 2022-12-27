@@ -1,3 +1,5 @@
+import sys
+
 # 这个文件用来存放一些通用的数据
 
 # 学生完成的义工的状态
@@ -26,3 +28,9 @@ def checkPermission(cls, pms, stu): # 判断一个用户是否有权限管理该
 
 CURRENT_VERSION = "51141167bd8394d8da590fddaeb3d91e"
 CURRENT_VERSION_ERROR_MESSAGE = "版本号过期，请重新下载"
+
+match sys.platform:
+	case 'win32':
+		STATIC_FOLDER = 'C:\zvms_backend'
+	case 'linux':
+		STATIC_FOLDER = '/tmp/zvms_backend'

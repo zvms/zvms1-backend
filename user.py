@@ -75,6 +75,8 @@ def getNotices(json_data, token_data):
     year, month, day = [int(i) for i in str(date.today()).split('-')]
 
     for i in ids:
+        if not i:
+            continue
         _, r = OP.select("noticeTitle, noticeText, deadtime", "user_notice", "noticeId = %s", i, ["title", "text", "deadtime"])
 
         y, m, d = [int(i) for i in r["deadtime"].split('-')]

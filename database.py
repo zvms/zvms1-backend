@@ -7,7 +7,7 @@ import traceback # 更好的错误输出
 # （临时的）设置，记得改密码！
 conn = connect(
     host = "127.0.0.1",
-    user = "zvms",
+    user = "qnc",
     password = "123456",
     db = "zvms"
 )
@@ -28,7 +28,7 @@ def test_connection():
     except:
         conn = connect(
             host = "127.0.0.1",
-            user = "zvms",
+            user = "qnc",
             password = "123456",
             db = "zvms"
         )
