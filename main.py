@@ -27,9 +27,9 @@ app.register_blueprint(Report)
 
 @app.route('/',methods=['GET', 'POST'])
 def main():
-   return "连上了"
+    return "连上了"
 
 # manager = Manager(app)
 if __name__ == '__main__':
-    # manager.run(host='0.0.0.0', port=5000)
+    #  manager.run(host='0.0.0.0', port=5000)
     app.run(host='0.0.0.0', port=5000)

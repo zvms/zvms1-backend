@@ -206,6 +206,11 @@ def getUnaudited(json_data, token_data):
 	
 	return {"type":"SUCCESS", "message": "获取成功", "result": r}
 
+# 列出所有未审核感想
+# 方法: GET
+# url参数: 无
+# 返回:
+# [{volId<int>: ..., stuId<int>: ...}, ...]
 @Volunteer.route('/volunteer/unaudited/list')
 @Deco
 def listUnaudited(json_data, token_data):
@@ -372,6 +377,8 @@ def submitThought(volId, json_data, token_data): # 大概是过了
 			t.update(pic.encode("utf-8"))
 			target = t.hexdigest()
 			pics_md5.append(target)
+			with open(f"pics/{i['stuId']}/{target}.jpg", 'wb') as f:
+				OP.insert('md, data', 'pics', (target, f.read()))
 
 			path = f"{STATIC_FOLDER}/pics/{target}.jpg"
 			if not exists(path):

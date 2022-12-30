@@ -1,6 +1,7 @@
 import sys
 from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired, BadTimeSignature
 import random, hashlib
+import sys
 
 ERROR = 0
 SUCCESS = 1
@@ -13,7 +14,7 @@ def generateStrangeString():
     s = md.hexdigest()
     return s
 
-if 'restart' in sys.argv:
+if len(sys.argv) > 1 and sys.argv[1].lower() == 'restart':
     SECRET_KEY = generateStrangeString()
     SALT = generateStrangeString()
     with open('tokengen.cfg', 'w') as f:
@@ -25,13 +26,10 @@ else:
 EXPIRES_IN = 36000000
 
 def generateToken(data):
-    global SECRET_KEY, SALT, EXPIRES_IN
     s = TimedJSONWebSignatureSerializer(secret_key=SECRET_KEY, expires_in=EXPIRES_IN, salt=SALT)
     return s.dumps(data).decode('ascii')
 
 def readToken(token):
-    global SECRET_KEY, SALT, EXPIRES_IN
-    global ERROR, SUCCESS, EXPIRED, BAD
     s = TimedJSONWebSignatureSerializer(secret_key=SECRET_KEY, salt=SALT)
     st = ERROR
     data = {}
