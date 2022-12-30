@@ -373,9 +373,11 @@ def submitThought(volId, json_data, token_data): # 大概是过了
 			target = t.hexdigest()
 			pics_md5.append(target)
 
-			f = open(f"{STATIC_FOLDER}/pics/{i['stuId']}/{target}.jpg", 'wb')
-			f.write(b64decode(pic))
-			f.close()
+			path = f"{STATIC_FOLDER}/pics/{target}.jpg"
+			if not exists(path):
+				f = open(path, 'wb')
+				f.write(b64decode(pic))
+				f.close()
 
 		pic = ",".join(pics_md5)
 
